@@ -1,0 +1,11 @@
+{
+  "name": "invoice-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "海外発送インボイス作成（Commercial / Proforma Invoice）",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8743",
+    "typecheck": "tsc --noEmit"
+  }
+}
