@@ -105,8 +105,9 @@ export const SCREENS = [
         id: 'destinationCountry',
         path: 'purpose.destinationCountry',
         label: 'どの国へ送りますか？',
+        why: 'ここで入力した国名は、英語の帳票にそのまま印字されます。必ず英語で入力してください。',
         type: 'text',
-        example: '例：アメリカ、フランス、タイ',
+        example: '英語で入力してください（例：USA, France, Thailand）※「アメリカ」のような日本語は不可',
         allowUnknown: true,
       },
       {

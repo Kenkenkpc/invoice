@@ -16,6 +16,7 @@ import { computeChecks } from '../rules/validation.js';
 let STATE = loadDraft() || createInitialState();
 let exportInProgress = false;
 let lastExportResult = null;
+let pendingFocusPath = null;
 
 const root = document.getElementById('app');
 
@@ -29,12 +30,36 @@ function setState(updated) {
   render();
 }
 
-function go(screenId) {
+/**
+ * 指定した画面へ移動する。fieldPath を渡すと、描画後にその入力欄までスクロールして
+ * 一時的にハイライトする（未入力・未確認の項目からの「この質問へ戻る」用）。
+ */
+function go(screenId, fieldPath) {
   const updated = { ...STATE, meta: { ...STATE.meta, currentScreenId: screenId } };
   if (!updated.meta.completedScreenIds.includes(STATE.meta.currentScreenId)) {
     updated.meta.completedScreenIds = [...updated.meta.completedScreenIds, STATE.meta.currentScreenId];
   }
+  pendingFocusPath = fieldPath || null;
   setState(updated);
+}
+
+function focusPendingField() {
+  if (!pendingFocusPath) return;
+  const path = pendingFocusPath;
+  pendingFocusPath = null;
+  const target = /** @type {HTMLElement|null} */ (document.querySelector('[data-field-path="' + path + '"]'));
+  if (!target) return;
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const highlightHost = target.closest('.field') || target.closest('.item-card') || target;
+  highlightHost.classList.add('field-highlight');
+  if (typeof target.focus === 'function') {
+    try {
+      target.focus({ preventScroll: true });
+    } catch (e) {
+      target.focus();
+    }
+  }
+  setTimeout(() => highlightHost.classList.remove('field-highlight'), 2400);
 }
 
 function renderProgress(container) {
@@ -141,7 +166,7 @@ function renderCustomScreen(screen, container) {
     case 'review':
       container.appendChild(
         renderReviewScreen(STATE, {
-          onJump: (id) => go(id),
+          onJump: (id, fieldPath) => go(id, fieldPath),
           onOpenPrint: () => openPrintModal(),
           onExportSheets: (isDraft) => handleExport(isDraft),
           onChangeDocumentStatus: (status) => {
@@ -263,6 +288,10 @@ export function render() {
   }
   root.appendChild(card);
   renderNav(root, screen);
+
+  if (pendingFocusPath) {
+    requestAnimationFrame(() => requestAnimationFrame(focusPendingField));
+  }
 }
 
 render();

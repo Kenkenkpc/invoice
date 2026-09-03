@@ -27,7 +27,7 @@ function renderItemCard(item, index, state, ctx) {
     ? Number(state.shipping.currencyDecimals.value)
     : defaultDecimalsForCurrency(state.shipping.currency?.value);
 
-  const card = el('div', { class: 'item-card' });
+  const card = el('div', { class: 'item-card', 'data-field-path': `items[${index}]` });
   card.appendChild(
     el('div', { class: 'item-card-header' }, [
       el('span', { class: 'item-card-title', text: `商品 ${index + 1}` }),

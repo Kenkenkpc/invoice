@@ -53,19 +53,54 @@ export function renderPartyForm(partyPath, state, onChange, opts = {}) {
 
   const addressHeading = el('h4', { class: 'subgroup-heading', text: '住所（郵便番号・部屋番号も忘れずに）' });
   container.appendChild(addressHeading);
+  container.appendChild(
+    el('p', {
+      class: 'field-warning',
+      text: '住所はすべて英語（ローマ字）で入力してください。ここに入力した内容が、英語の帳票にそのまま印字されます。',
+    })
+  );
 
   const addressGrid = el('div', { class: 'address-grid' });
-  addressGrid.appendChild(renderField({ id: 'postalCode', path: `${partyPath}.postalCode`, label: '郵便番号', type: 'text', example: '例：150-0001' }, state, onChange));
-  addressGrid.appendChild(renderField({ id: 'prefecture', path: `${partyPath}.prefecture`, label: '都道府県（または州）', type: 'text' }, state, onChange));
-  addressGrid.appendChild(renderField({ id: 'city', path: `${partyPath}.city`, label: '市区町村', type: 'text' }, state, onChange));
+  addressGrid.appendChild(
+    renderField({ id: 'postalCode', path: `${partyPath}.postalCode`, label: '郵便番号', type: 'text', example: '例：150-0001' }, state, onChange)
+  );
   addressGrid.appendChild(
     renderField(
-      { id: 'addressLine', path: `${partyPath}.addressLine`, label: '番地・建物名・部屋番号', type: 'text', example: '部屋番号やビル名も省略せずに入力してください' },
+      { id: 'prefecture', path: `${partyPath}.prefecture`, label: '都道府県（または州）', type: 'text', example: '英語で入力（例：Tokyo）' },
       state,
       onChange
     )
   );
-  addressGrid.appendChild(renderField({ id: 'country', path: `${partyPath}.country`, label: '国', type: 'text' }, state, onChange));
+  addressGrid.appendChild(
+    renderField({ id: 'city', path: `${partyPath}.city`, label: '市区町村', type: 'text', example: '英語で入力（例：Shibuya-ku）' }, state, onChange)
+  );
+  addressGrid.appendChild(
+    renderField(
+      {
+        id: 'addressLine',
+        path: `${partyPath}.addressLine`,
+        label: '番地・建物名・部屋番号',
+        type: 'text',
+        example: '英語で入力してください。部屋番号やビル名も省略しないでください（例：1-2-3 Sample Bldg 4F）',
+      },
+      state,
+      onChange
+    )
+  );
+  addressGrid.appendChild(
+    renderField(
+      {
+        id: 'country',
+        path: `${partyPath}.country`,
+        label: '国',
+        why: '英語の帳票にそのまま印字されるため、必ず英語で入力してください。',
+        example: '例：Japan, USA, France　※「日本」のような日本語は不可',
+        type: 'text',
+      },
+      state,
+      onChange
+    )
+  );
   container.appendChild(addressGrid);
 
   const contactHeading = el('h4', { class: 'subgroup-heading', text: '連絡先' });

@@ -380,6 +380,35 @@ textarea.text-input {
   background: var(--teal-light);
   color: var(--teal);
 }
+.unresolved-required {
+  background: #b3261e;
+  color: #fff;
+  font-weight: 700;
+}
+.unresolved-item.unresolved-blocking {
+  background: var(--warning-bg);
+  border-radius: 6px;
+  padding: 10px 12px;
+  border-bottom: none;
+  margin-bottom: 8px;
+}
+.unresolved-summary {
+  border: 2px solid #b3261e33;
+}
+
+@keyframes field-highlight-pulse {
+  0% {
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0);
+  }
+}
+.field-highlight {
+  animation: field-highlight-pulse 1.2s ease-out 2;
+  border-radius: 8px;
+  background: #fff8e1;
+}
 .review-actions {
   display: flex;
   gap: 14px;

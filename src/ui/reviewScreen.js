@@ -79,6 +79,34 @@ export function renderReviewScreen(state, ctx) {
   }
   container.appendChild(banner);
 
+  const blockingCount = checks.blocking.length;
+  const unresolvedHeading =
+    blockingCount > 0 ? `未入力・未確認の必須項目（あと${blockingCount}件）` : '確認事項（参考・必須ではありません）';
+  const unresolvedBody =
+    checks.all.length === 0
+      ? [el('p', { text: '未解決の項目はありません。' })]
+      : [...checks.all]
+          .sort((a, b) => Number(b.blocksFinal) - Number(a.blocksFinal))
+          .map((i) =>
+            el('div', { class: 'unresolved-item' + (i.blocksFinal ? ' unresolved-blocking' : '') }, [
+              el('span', {
+                class: 'unresolved-badge unresolved-' + i.category,
+                text: { format: '形式エラー', missing: '未入力', external: '要確認' }[i.category],
+              }),
+              i.blocksFinal ? el('span', { class: 'unresolved-badge unresolved-required', text: '必須' }) : null,
+              el('span', { text: ' ' + i.message }),
+              i.guidance ? el('p', { class: 'field-note', text: i.guidance }) : null,
+              el(
+                'button',
+                { type: 'button', class: 'link-btn', onclick: () => ctx.onJump(i.screenId, i.fieldPath) },
+                'この質問へ移動する'
+              ),
+            ])
+          );
+  container.appendChild(
+    el('section', { class: 'review-card unresolved-summary' }, [el('h3', { text: unresolvedHeading }), ...unresolvedBody])
+  );
+
   container.appendChild(
     sectionCard(
       '作成する書類の種類と用途',
@@ -145,19 +173,6 @@ export function renderReviewScreen(state, ctx) {
       ctx.onJump
     )
   );
-
-  const unresolvedBody =
-    checks.all.length === 0
-      ? [el('p', { text: '未解決の項目はありません。' })]
-      : checks.all.map((i) =>
-          el('div', { class: 'unresolved-item' }, [
-            el('span', { class: 'unresolved-badge unresolved-' + i.category, text: { format: '形式エラー', missing: '未入力', external: '要確認' }[i.category] }),
-            el('span', { text: ' ' + i.message }),
-            i.guidance ? el('p', { class: 'field-note', text: i.guidance }) : null,
-            el('button', { type: 'button', class: 'link-btn', onclick: () => ctx.onJump(i.screenId) }, 'この質問へ戻る'),
-          ])
-        );
-  container.appendChild(el('section', { class: 'review-card' }, [el('h3', { text: '未入力・未確認の項目' }), ...unresolvedBody]));
 
   container.appendChild(el('h3', { text: '出力される英語帳票' }));
   container.appendChild(el('p', { text: `${state.invoice.docType.value === 'proforma' ? 'PROFORMA INVOICE' : 'COMMERCIAL INVOICE'}${isDraft ? '（DRAFT表示付き）' : ''}` }));

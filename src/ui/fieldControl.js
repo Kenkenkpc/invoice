@@ -75,7 +75,12 @@ export function renderField(fieldDef, state, onChange) {
 
   switch (fieldDef.type) {
     case 'choice': {
-      const group = el('div', { class: 'choice-group', role: 'radiogroup', 'aria-label': fieldDef.label });
+      const group = el('div', {
+        class: 'choice-group',
+        role: 'radiogroup',
+        'aria-label': fieldDef.label,
+        'data-field-path': fieldDef.path,
+      });
       for (const opt of optionsForField(fieldDef)) {
         const isActive =
           field.status === FieldStatus.FILLED &&

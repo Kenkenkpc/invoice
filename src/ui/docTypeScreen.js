@@ -25,7 +25,7 @@ export function renderDocTypeScreen(state, onChange) {
   }
 
   const current = state.invoice.docType;
-  const group = el('div', { class: 'choice-group' });
+  const group = el('div', { class: 'choice-group', 'data-field-path': 'invoice.docType' });
   for (const opt of [
     { value: 'commercial', label: 'Commercial Invoice（実際の取引・請求）' },
     { value: 'proforma', label: 'Proforma Invoice（見積り・仮の書類）' },

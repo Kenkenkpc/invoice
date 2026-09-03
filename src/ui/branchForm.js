@@ -11,7 +11,7 @@ export function renderSameAsBuyerBranch(opts, state, onChange) {
   if (opts.explanation) container.appendChild(el('p', { class: 'field-why', text: opts.explanation }));
 
   const sameField = state[opts.sameKey];
-  const group = el('div', { class: 'choice-group' });
+  const group = el('div', { class: 'choice-group', 'data-field-path': opts.sameKey });
   const choices = [
     { value: 'true', label: '同じ' },
     { value: 'false', label: '違う' },

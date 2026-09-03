@@ -50,4 +50,32 @@
   assertEqual(state.exporter.nameJa.value, beforeExporter, 'ドキュメント種別切替で送り主情報は消えない');
 }
 
+// 送り先の国名が日本語だとformatエラーになる（英語の帳票にそのまま印字されるため）
+{
+  const state = createInitialState();
+  state.purpose.destinationCountry = setValue(state.purpose.destinationCountry, 'アメリカ');
+  const checks = computeChecks(state);
+  const found = checks.all.find((i) => i.id === 'purpose.destinationCountry.language');
+  assertTrue(!!found, '送り先国名の日本語がformatエラーとして検出される');
+  assertEqual(found.category, 'format', '送り先国名の日本語エラーはformat分類');
+}
+
+// 送り先の国名が英語なら検出されない
+{
+  const state = createInitialState();
+  state.purpose.destinationCountry = setValue(state.purpose.destinationCountry, 'USA');
+  const checks = computeChecks(state);
+  const found = checks.all.find((i) => i.id === 'purpose.destinationCountry.language');
+  assertTrue(!found, '英語の送り先国名はエラーにならない');
+}
+
+// 買主の国名が日本語だとformatエラーになる
+{
+  const state = createInitialState();
+  state.buyer.country = setValue(state.buyer.country, '日本');
+  const checks = computeChecks(state);
+  const found = checks.all.find((i) => i.id === 'buyer.country.language');
+  assertTrue(!!found, '買主の国名の日本語がformatエラーとして検出される');
+}
+
 summary();

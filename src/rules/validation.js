@@ -10,6 +10,13 @@ import { parseDecimalToFixed, calcLineAmount, defaultDecimalsForCurrency } from 
 const CATEGORY = Object.freeze({ FORMAT: 'format', MISSING: 'missing', EXTERNAL: 'external' });
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+// ひらがな・カタカナ・漢字（CJK統合漢字）を含むかどうか。英語の帳票にそのまま印字される
+// 国名などに日本語が残っていないかを検知するために使う。
+const JAPANESE_CHAR_RE = /[぀-ヿ㐀-鿿]/;
+
+function containsJapanese(value) {
+  return typeof value === 'string' && JAPANESE_CHAR_RE.test(value);
+}
 
 function issue(list, category, id, screenId, fieldPath, message, opts = {}) {
   list.push({
@@ -60,6 +67,16 @@ function checkPartyRequired(list, party, label, screenId, pathPrefix) {
       );
     }
   }
+  if (hasValue(party.country) && containsJapanese(party.country.value)) {
+    issue(
+      list,
+      CATEGORY.FORMAT,
+      `${pathPrefix}.country.language`,
+      screenId,
+      `${pathPrefix}.country`,
+      `${label}：国名が日本語のままです。英語の帳票にそのまま印字されるため、英語（例：Japan, USA）で入力し直してください。`
+    );
+  }
 }
 
 /**
@@ -94,6 +111,16 @@ export function computeChecks(state) {
   }
   if (state.invoice.docType?.value === 'proforma' && hasValue(state.invoice.validUntil) && !DATE_RE.test(state.invoice.validUntil.value)) {
     issue(list, CATEGORY.FORMAT, 'invoice.validUntil.format', 'invoiceMeta', 'invoice.validUntil', '見積有効期限の形式が正しくありません（YYYY-MM-DD）。');
+  }
+  if (hasValue(state.purpose.destinationCountry) && containsJapanese(state.purpose.destinationCountry.value)) {
+    issue(
+      list,
+      CATEGORY.FORMAT,
+      'purpose.destinationCountry.language',
+      'purposeDetails',
+      'purpose.destinationCountry',
+      '送り先の国名が日本語のままです。英語の帳票にそのまま印字されるため、英語（例：USA, France, Thailand）で入力し直してください。'
+    );
   }
 
   // --- 送り主 ---
